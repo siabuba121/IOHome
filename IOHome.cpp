@@ -13,8 +13,6 @@ IOHome::IOHome(int *usedPorts,int countPorts, char* ssid, char* password, ESP826
     this->countPorts = countPorts;
     this->usedPorts = usedPorts;
     Serial.begin(9600);
-    Serial.println("testowo 2 element ze wskaznika");
-    Serial.println(*(this->usedPorts+1));
     this->setPorts(usedPorts,countPorts);
     this->connectToWifi(ssid, password);
 }
