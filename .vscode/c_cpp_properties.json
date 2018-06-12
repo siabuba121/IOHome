@@ -8,7 +8,8 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": false,
                 "path": [
-                    "E:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino"
+                    "E:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino",
+                    "${workspaceRoot}"
                 ]
             },
             "intelliSenseMode": "msvc-x64",

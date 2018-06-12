@@ -13,10 +13,12 @@ class IOHome {
     private:
         int *usedPorts;
         int countPorts;
+        ESP8266WebServer server;
         void connectToWifi(char* ssid, char* password);
         void setPorts(int usedPorts[],int count);
         void notifyOfConnectionStatus();
-        void changePinStatusService();
+        void changePinStatusServiceInit();
+        void changePortStatus();
 };
 
 #endif
