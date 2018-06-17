@@ -9,16 +9,20 @@
 
 class IOHome {
     public:
-        IOHome(int *usedPorts,int countPorts, char* ssid, char* password, ESP8266WebServer server);
+        IOHome();
+        void handleClient();
+        void init(int *usedPorts,int countPorts, const char* ssid, const char* password);
     private:
         int *usedPorts;
         int countPorts;
         ESP8266WebServer server;
-        void connectToWifi(char* ssid, char* password);
+        void connectToWifi(const char* ssid, const char* password);
         void setPorts(int usedPorts[],int count);
         void notifyOfConnectionStatus();
         void changePinStatusServiceInit();
         void changePortStatus();
+        void initHTTPServer(int port);
+        void getPortStatus();
 };
 
 #endif
