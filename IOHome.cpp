@@ -8,13 +8,16 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
 IOHome::IOHome(){
 }
 
-void IOHome::init(int *usedPorts,int countPorts, const char* ssid, const char* password){
+void IOHome::init(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C lcd){
     this->countPorts = countPorts;
     this->usedPorts = usedPorts;
+    this->lcd = &lcd;
     //this->server = server;
     Serial.begin(9600);
     this->setPorts(usedPorts,countPorts);
@@ -33,7 +36,30 @@ void IOHome::connectToWifi(const char* ssid, const char* password){
     }
     Serial.println("Connected to "+String(ssid)+" IP:");
     Serial.print(WiFi.localIP());
+    this->writeToScreen(WiFi.localIP().toString(),0);
     this->notifyOfConnectionStatus();
+}
+
+void IOHome::initScreen(){
+    this->lcd->begin(16,2);
+    this->lcd->setBacklightPin(3,POSITIVE);
+    this->lcd->setBacklight(HIGH);
+    this->lcd->home();
+    this->lcd->print("TEST");
+}
+
+void IOHome::writeToScreen(String message, int line){
+    LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);
+    lcd.begin(16,2);
+    lcd.setBacklightPin(3,POSITIVE);
+    lcd.setBacklight(HIGH);
+    lcd.setCursor(0,line);
+    lcd.print(message);
+    //this->lcd->setCursor(0,line);
+    //this->lcd->print(message);
+    //Serial.println("pisanie na ekran");
+
+    //delete &lcd;
 }
 
 void IOHome::setPorts(int usedPorts[],int count){
@@ -57,6 +83,15 @@ void IOHome::changePortStatus(){
     }else{
       digitalWrite(pin.toInt(),status.toInt());
       this->server.send(200, "text/plain","Zmieniono status "+pin+" "+status);
+      //OBSLUGA URZADZENIA
+      //TRZEBA TO TROCHE INACZEJ ROZWIAZAC
+      if(pin.toInt() == 16){
+          if(status.toInt() == 1){
+              this->writeToScreen("Bojler wlaczony",1);
+          }else{
+              this->writeToScreen("Bojler wylaczony",1);
+          }
+      }
     }
 }
 
