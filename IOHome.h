@@ -13,7 +13,7 @@ class IOHome {
     public:
         IOHome();
         void handleClient();
-        void init(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C lcd);
+        void init(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C *lcd);
     private:
         int *usedPorts;
         int countPorts;

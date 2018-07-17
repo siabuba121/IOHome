@@ -14,10 +14,11 @@
 IOHome::IOHome(){
 }
 
-void IOHome::init(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C lcd){
+void IOHome::init(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C* lcd){
     this->countPorts = countPorts;
     this->usedPorts = usedPorts;
-    this->lcd = &lcd;
+    this->lcd = lcd;
+    this->initScreen();
     //this->server = server;
     Serial.begin(9600);
     this->setPorts(usedPorts,countPorts);
@@ -25,6 +26,7 @@ void IOHome::init(int *usedPorts,int countPorts, const char* ssid, const char* p
     this->initHTTPServer(80);
     this->changePinStatusServiceInit();
 }
+
 void IOHome::connectToWifi(const char* ssid, const char* password){
     Serial.println("trying to connect with "+String(ssid)+" pass "+String(password));
     WiFi.begin(ssid, password);
@@ -49,14 +51,15 @@ void IOHome::initScreen(){
 }
 
 void IOHome::writeToScreen(String message, int line){
-    LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);
-    lcd.begin(16,2);
-    lcd.setBacklightPin(3,POSITIVE);
-    lcd.setBacklight(HIGH);
-    lcd.setCursor(0,line);
-    lcd.print(message);
-    //this->lcd->setCursor(0,line);
-    //this->lcd->print(message);
+    //LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);
+    //lcd.begin(16,2);
+    //lcd.setBacklightPin(3,POSITIVE);
+    //lcd.setBacklight(HIGH);
+    //lcd.setCursor(0,line);
+    //lcd.print(message);
+
+    this->lcd->setCursor(0,line);
+    this->lcd->print(message);
     //Serial.println("pisanie na ekran");
 
     //delete &lcd;
