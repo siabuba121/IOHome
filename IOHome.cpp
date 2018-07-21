@@ -12,19 +12,48 @@
 #include <LiquidCrystal_I2C.h>
 
 IOHome::IOHome(){
+    Serial.begin(9600);
 }
 
-void IOHome::init(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C* lcd){
+void IOHome::initAsRoom(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C* lcd){
     this->countPorts = countPorts;
     this->usedPorts = usedPorts;
     this->lcd = lcd;
     this->initScreen();
     //this->server = server;
-    Serial.begin(9600);
     this->setPorts(usedPorts,countPorts);
     this->connectToWifi(ssid, password);
     this->initHTTPServer(80);
     this->changePinStatusServiceInit();
+    this->objectType = "ROOM";
+}
+
+void IOHome::initAsPlant(int signalMoisturePin, const char* ssid, const char* password){
+    this->signalMoisturePin = signalMoisturePin;
+    this->connectToWifi(ssid,password);
+    Serial.println("tworzenie serwera");
+    delay(2000);
+    this->initHTTPServer(80);
+    Serial.println("init as a plant");
+    this->initPlantMoistureService();
+    this->objectType = "PLANT";
+}
+
+void IOHome::getHumidity(){
+    float humidity = analogRead(this->signalMoisturePin);
+    humidity = (1023-humidity)/1023*100;
+    this->server.send(200,"application/json","{'humidity':"+String(humidity)+"}");
+}
+
+void IOHome::waterPlant(){
+
+}
+void IOHome::initPlantMoistureService(){
+    if(MDNS.begin("esp8266")) {
+        Serial.println("MDNS responder started");
+    }
+    this->server.on("/getHumidity",std::bind(&IOHome::getHumidity,this));
+    this->server.begin();
 }
 
 void IOHome::connectToWifi(const char* ssid, const char* password){
@@ -38,7 +67,7 @@ void IOHome::connectToWifi(const char* ssid, const char* password){
     }
     Serial.println("Connected to "+String(ssid)+" IP:");
     Serial.print(WiFi.localIP());
-    this->writeToScreen(WiFi.localIP().toString(),0);
+    //this->writeToScreen(WiFi.localIP().toString(),0);
     this->notifyOfConnectionStatus();
 }
 
@@ -51,25 +80,14 @@ void IOHome::initScreen(){
 }
 
 void IOHome::writeToScreen(String message, int line){
-    //LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);
-    //lcd.begin(16,2);
-    //lcd.setBacklightPin(3,POSITIVE);
-    //lcd.setBacklight(HIGH);
-    //lcd.setCursor(0,line);
-    //lcd.print(message);
-
     this->lcd->setCursor(0,line);
     this->lcd->print(message);
-    //Serial.println("pisanie na ekran");
-
-    //delete &lcd;
 }
 
 void IOHome::setPorts(int usedPorts[],int count){
     for(int i = 0;i<count;i++){
         pinMode(usedPorts[i],OUTPUT);
         Serial.println(usedPorts[i]);
-
     }
 }
 

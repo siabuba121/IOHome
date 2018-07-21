@@ -13,21 +13,39 @@ class IOHome {
     public:
         IOHome();
         void handleClient();
-        void init(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C *lcd);
+        void initAsRoom(int *usedPorts,int countPorts, const char* ssid, const char* password, LiquidCrystal_I2C *lcd);
+        
+        //PLANT
+        int signalMoisturePin;
+        void initAsPlant(int signalMoisturePin,const char* ssid, const char* password);
+        void waterPlant();
+        void initPlantMoistureService();
+        void getHumidity();
+        //END PLANT
     private:
+        String objectType;
+        
+        //PORTS
         int *usedPorts;
         int countPorts;
-        ESP8266WebServer server;
+        void setPorts(int usedPorts[],int count);
+        void changePinStatusServiceInit();
+        void changePortStatus();
+        void getPortStatus();
+        //END PORTS
+        
+        //SCREEN
         LiquidCrystal_I2C *lcd;
         void initScreen();
         void writeToScreen(String message,int line);
+        //END SCREEN
+
+        //WIFI + SERVER
         void connectToWifi(const char* ssid, const char* password);
-        void setPorts(int usedPorts[],int count);
         void notifyOfConnectionStatus();
-        void changePinStatusServiceInit();
-        void changePortStatus();
         void initHTTPServer(int port);
-        void getPortStatus();
+        ESP8266WebServer server;
+        //END WIFI
 };
 
 #endif
